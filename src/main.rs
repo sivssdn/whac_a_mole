@@ -23,6 +23,11 @@ fn main() {
     window.set_lazy(true);
 
     while let Some(event) = window.next() {
+           
+           if let Some(Button::Keyboard(key)) = event.press_args() {
+               println!("{:?}", key);
+           }
+
            window.draw_2d(&event, |context, graphics, _device| {
             clear([1.0; 4], graphics);
             rectangle([1.0, 0.0, 0.0, 1.0], // red
