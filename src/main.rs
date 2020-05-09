@@ -22,6 +22,14 @@ fn main() {
            
         if let Some(Button::Keyboard(key)) = event.press_args() {
             println!("{:?}", key);
+            match key {
+                Key::Return => {
+                    if game.page == 1 {
+                        game.set_page(2);
+                    }
+                },
+                _ => {}
+            }
         }
         game.render(&mut window, &background, event);
         
