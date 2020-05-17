@@ -35,7 +35,6 @@ fn main() {
         if let Some(_args) = event.render_args() {
             game.render(event);
         }
-        // game.render(event); //too many renders, TODO:: check Input::Render, Update and release events
         
     }
 }
