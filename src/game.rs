@@ -1,44 +1,58 @@
+use std::path::PathBuf;
 use piston_window::*;
 
 pub struct Game {
-    pub page: u8
+    pub page: u8,
+    pub window: PistonWindow,
+    pub assets: PathBuf
 }
 
 impl Game {
-    pub fn get_background(&mut self, window: &mut PistonWindow) -> G2dTexture {
-        let assets = find_folder::Search::ParentsThenKids(3,3)
-                .for_folder("assets").unwrap();
+    pub fn get_background(&mut self) -> G2dTexture {
         return Texture::from_path(
-            &mut window.create_texture_context(),
-            assets.join("wallpaper.jpeg"),
+            &mut self.window.create_texture_context(),
+            self.assets.join("window.png"),
             Flip::None,
             &TextureSettings::new()
         ).unwrap();
     }
 
-    pub fn render(&mut self, window: &mut PistonWindow, background: &G2dTexture, event: piston_window::Event) {
-        let assets = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets").unwrap();
-        let mut glyphs = window.load_font(assets.join("Amatic-Bold.ttf")).unwrap();
-    //=====----for fonts    
+    //calls page render based on page number background: &G2dTexture
+    pub fn render(&mut self, event: piston_window::Event) {
+        match self.page {
+            1 => self.menu_page(event),
+            2 => {
+                println!("PAGE 2 -----");
+                self.menu_page(event);
+            },
+            _ => {}
+        }
+    }
 
-        window.draw_2d(&event, |context, graphics, device| {
+    //renders menu page
+    fn menu_page(&mut self, event: piston_window::Event) {
+        let mut glyphs = self.window.load_font(self.assets.join("Amatic-Bold.ttf")).unwrap();
+        let background = self.get_background();
+        self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
-            rectangle([0.0, 0.0, 0.0, 1.0], // red
+            rectangle([0.0, 0.0, 0.0, 1.0], // bgcolor
                       [0.0, 0.0, 1024.0, 720.0],
                       context.transform,
                       graphics);
-            // image(background, context.transform, graphics);
 
             text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52).draw(
                 "Press 'enter' to start",
                 &mut glyphs,
                 &context.draw_state,
-                context.transform.trans(120.0, 200.0),
+                context.transform.trans(320.0, 300.0),
                 graphics
             ).unwrap();
             // Update glyphs before rendering.
             glyphs.factory.encoder.flush(device);
+
+            image(&background,
+            context.transform.scale(0.5, 0.5),
+            graphics);
         });
     }
 

@@ -7,18 +7,18 @@ mod game;
 
 fn main() {
     let opengl = OpenGL::V3_2;
-    let mut window: PistonWindow = 
+    let window: PistonWindow = 
         WindowSettings::new("Precision Sniper", [1024, 720])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();
-    
+    let assets = find_folder::Search::ParentsThenKids(3,3)
+                .for_folder("assets").unwrap();
 
-    let mut game = game::Game { page: 1 };
-    let background = game.get_background(&mut window);
+    let mut game = game::Game { page: 1, window: window, assets: assets };
 
-    while let Some(event) = window.next() {
+    while let Some(event) = game.window.next() {
            
         if let Some(Button::Keyboard(key)) = event.press_args() {
             println!("{:?}", key);
@@ -31,7 +31,11 @@ fn main() {
                 _ => {}
             }
         }
-        game.render(&mut window, &background, event);
+
+        if let Some(_args) = event.render_args() {
+            game.render(event);
+        }
+        // game.render(event); //too many renders, TODO:: check Input::Render, Update and release events
         
     }
 }
