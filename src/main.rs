@@ -15,8 +15,7 @@ fn main() {
         .unwrap();
     let assets = find_folder::Search::ParentsThenKids(3,3)
                 .for_folder("assets").unwrap();
-
-    let mut game = game::Game { page: 1, window: window, assets: assets };
+    let mut game = game::Game { page: 1, window: window, assets: assets, control_keys: ["Q", "W", "E", "R"] }; //move to constructor
 
     while let Some(event) = game.window.next() {
            

@@ -4,7 +4,8 @@ use piston_window::*;
 pub struct Game {
     pub page: u8,
     pub window: PistonWindow,
-    pub assets: PathBuf
+    pub assets: PathBuf,
+    pub control_keys: [&'static str; 4]
 }
 
 impl Game {
@@ -13,7 +14,7 @@ impl Game {
         match self.page {
             1 => self.menu_page(event),
             2 => {
-                println!("PAGE 2 -----");
+                println!("PAGE 2 ----- ");
                 self.game_page(event);
             },
             _ => {}
@@ -55,35 +56,38 @@ impl Game {
     //renders game page
     fn game_page(&mut self, event: piston_window::Event) {
         let window_image = self.get_image("window.png");
+        let mut glyphs = self.window.load_font(self.assets.join("Amatic-Bold.ttf")).unwrap();  
         let y_axis = 320.0;
         let mut x_axis = 120.0;
-        self.window.draw_2d(&event, |context, graphics, _device| {
+        let mut x_axis_text = 120.0;
+        let control_keys = self.control_keys;
+
+        self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
             rectangle([0.0, 0.0, 0.0, 1.0], // page background
                       [0.0, 0.0, 1024.0, 720.0],
                       context.transform,
                       graphics);
-            //windows
-            image(
-                &window_image,
-                context.transform.scale(0.4, 0.4).trans(x_axis, y_axis),
-                graphics);
-            x_axis += 600.0;
-            image(
-                &window_image,
-                context.transform.scale(0.4, 0.4).trans(x_axis, y_axis),
-                graphics);
-            x_axis += 600.0;
-            image(
-                &window_image,
-                context.transform.scale(0.4, 0.4).trans(x_axis, y_axis),
-                graphics);
-            x_axis += 600.0;
-            image(
-                &window_image,
-                context.transform.scale(0.4, 0.4).trans(x_axis, y_axis),
-                graphics);
-
+            for index in 0..4 {
+                //window
+                image(
+                    &window_image,
+                    context.transform.scale(0.4, 0.4).trans(x_axis, y_axis),
+                    graphics);
+                //window key
+                text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52).draw(
+                    &control_keys[index],
+                    &mut glyphs,
+                    &context.draw_state,
+                    context.transform.trans(x_axis_text, y_axis + 140.0),
+                    graphics
+                ).unwrap();
+                x_axis += 600.0;
+                x_axis_text += 254.0;
+            }
+            
+            // Update glyphs before rendering.
+            glyphs.factory.encoder.flush(device);
         });
     }
 
