@@ -1,11 +1,14 @@
-use std::path::PathBuf;
+extern crate rand;
+
 use piston_window::*;
+use rand::Rng;
+use std::path::PathBuf;
 
 pub struct Game {
     pub page: u8,
     pub window: PistonWindow,
     pub assets: PathBuf,
-    pub control_keys: [&'static str; 4]
+    pub control_keys: [&'static str; 4],
 }
 
 impl Game {
@@ -16,7 +19,7 @@ impl Game {
             2 => {
                 println!("PAGE 2 ----- ");
                 self.game_page(event);
-            },
+            }
             _ => {}
         }
     }
@@ -27,27 +30,35 @@ impl Game {
             &mut self.window.create_texture_context(),
             self.assets.join(image_name),
             Flip::None,
-            &TextureSettings::new()
-        ).unwrap();
+            &TextureSettings::new(),
+        )
+        .unwrap();
     }
 
     //renders menu page
     fn menu_page(&mut self, event: piston_window::Event) {
-        let mut glyphs = self.window.load_font(self.assets.join("Amatic-Bold.ttf")).unwrap();  
+        let mut glyphs = self
+            .window
+            .load_font(self.assets.join("Amatic-Bold.ttf"))
+            .unwrap();
         self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
-            rectangle([0.0, 0.0, 0.0, 1.0], // page background
-                      [0.0, 0.0, 1024.0, 720.0],
-                      context.transform,
-                      graphics);
+            rectangle(
+                [0.0, 0.0, 0.0, 1.0], // page background
+                [0.0, 0.0, 1024.0, 720.0],
+                context.transform,
+                graphics,
+            );
 
-            text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52).draw(
-                "Press 'enter' to start",
-                &mut glyphs,
-                &context.draw_state,
-                context.transform.trans(320.0, 300.0),
-                graphics
-            ).unwrap();
+            text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52)
+                .draw(
+                    "Press 'enter' to start",
+                    &mut glyphs,
+                    &context.draw_state,
+                    context.transform.trans(320.0, 300.0),
+                    graphics,
+                )
+                .unwrap();
             // Update glyphs before rendering.
             glyphs.factory.encoder.flush(device);
         });
@@ -56,39 +67,59 @@ impl Game {
     //renders game page
     fn game_page(&mut self, event: piston_window::Event) {
         let window_image = self.get_image("window.png");
-        let mut glyphs = self.window.load_font(self.assets.join("Amatic-Bold.ttf")).unwrap();  
+        let target_image = self.get_image("wild.png");
+        let mut glyphs = self
+            .window
+            .load_font(self.assets.join("Amatic-Bold.ttf"))
+            .unwrap();
         let y_axis = 320.0;
         let mut x_axis = 120.0;
         let mut x_axis_text = 120.0;
         let control_keys = self.control_keys;
+        let [target_x, target_y] = self.get_target_location();
 
         self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
-            rectangle([0.0, 0.0, 0.0, 1.0], // page background
-                      [0.0, 0.0, 1024.0, 720.0],
-                      context.transform,
-                      graphics);
+            rectangle(
+                [0.0, 0.0, 0.0, 1.0], // page background
+                [0.0, 0.0, 1024.0, 720.0],
+                context.transform,
+                graphics,
+            );
             for index in 0..4 {
                 //window
                 image(
                     &window_image,
                     context.transform.scale(0.4, 0.4).trans(x_axis, y_axis),
-                    graphics);
+                    graphics,
+                );
                 //window key
-                text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52).draw(
-                    &control_keys[index],
-                    &mut glyphs,
-                    &context.draw_state,
-                    context.transform.trans(x_axis_text, y_axis + 140.0),
-                    graphics
-                ).unwrap();
+                text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52)
+                    .draw(
+                        &control_keys[index],
+                        &mut glyphs,
+                        &context.draw_state,
+                        context.transform.trans(x_axis_text, y_axis + 140.0),
+                        graphics,
+                    )
+                    .unwrap();
                 x_axis += 600.0;
                 x_axis_text += 254.0;
             }
-            
+            //target image
+            image(
+                &target_image,
+                context.transform.scale(0.3, 0.3).trans(target_x, target_y),
+                graphics,
+            );
             // Update glyphs before rendering.
             glyphs.factory.encoder.flush(device);
         });
+    }
+
+    fn get_target_location(&self) -> [f64; 2] {
+        let choosen_coords: f64 = rand::thread_rng().gen_range(0.0, 4.0);
+        [230.0 + (choosen_coords.floor() * 810.0), 500.0]
     }
 
     pub fn set_page(&mut self, page_number: u8) {
