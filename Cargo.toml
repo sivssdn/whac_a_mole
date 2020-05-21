@@ -1,5 +1,5 @@
 [package]
-name = "kill_bill"
+name = "whac_a_mole"
 version = "0.1.0"
 authors = ["Paras <sivssdn@gmail.com>"]
 edition = "2018"

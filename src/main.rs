@@ -7,7 +7,7 @@ mod game;
 
 fn main() {
     let opengl = OpenGL::V3_2;
-    let window: PistonWindow = WindowSettings::new("Precision Sniper", [1024, 720])
+    let window: PistonWindow = WindowSettings::new("Whac A Mole", [1024, 720])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
@@ -19,20 +19,13 @@ fn main() {
         page: 1,
         window: window,
         assets: assets,
-        control_keys: ["Q", "W", "E", "R"],
+        control_keys: ["Q", "R", "U", "P"],
+        current_target_window: -1,
     }; //move to constructor
 
     while let Some(event) = game.window.next() {
         if let Some(Button::Keyboard(key)) = event.press_args() {
-            println!("{:?}", key);
-            match key {
-                Key::Return => {
-                    if game.page == 1 {
-                        game.set_page(2);
-                    }
-                }
-                _ => {}
-            }
+            game.handle_usere_input(key);
         }
 
         if let Some(_args) = event.render_args() {

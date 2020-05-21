@@ -502,15 +502,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
-name = "kill_bill"
-version = "0.1.0"
-dependencies = [
- "find_folder",
- "piston_window",
- "rand 0.7.3",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1421,6 +1412,15 @@ checksum = "520ab0fd578017a0ee2206623ba9ef4afe5e8f23ca7b42f6acfba2f4e66b1628"
 dependencies = [
  "dlib",
  "lazy_static",
+]
+
+[[package]]
+name = "whac_a_mole"
+version = "0.1.0"
+dependencies = [
+ "find_folder",
+ "piston_window",
+ "rand 0.7.3",
 ]
 
 [[package]]
