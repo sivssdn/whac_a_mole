@@ -20,7 +20,8 @@ fn main() {
         window: window,
         assets: assets,
         control_keys: ["Q", "R", "U", "P"],
-        current_target_window: -1,
+        current_target_window: 11,
+        total_score: 0,
     }; //move to constructor
 
     while let Some(event) = game.window.next() {

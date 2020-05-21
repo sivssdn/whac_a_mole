@@ -9,7 +9,8 @@ pub struct Game {
     pub window: PistonWindow,
     pub assets: PathBuf,
     pub control_keys: [&'static str; 4],
-    pub current_target_window: i32,
+    pub current_target_window: usize,
+    pub total_score: i32,
 }
 
 impl Game {
@@ -81,9 +82,10 @@ impl Game {
         let y_axis = 320.0;
         let mut x_axis = 120.0;
         let mut x_axis_text = 120.0;
+        let score = self.total_score;
         let control_keys = self.control_keys;
         let [window_number, target_x, target_y] = self.get_target_location();
-        self.set_current_target_window(window_number as i32);
+        self.set_current_target_window(window_number as usize);
 
         self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
@@ -119,25 +121,37 @@ impl Game {
                 context.transform.scale(0.3, 0.3).trans(target_x, target_y),
                 graphics,
             );
+            //score
+            text::Text::new_color([1.0, 1.0, 0.0, 1.0], 52)
+                .draw(
+                    &format!("Score : {}", score),
+                    &mut glyphs,
+                    &context.draw_state,
+                    context.transform.trans(60.0, 700.0),
+                    graphics,
+                )
+                .unwrap();
             // Update glyphs before rendering.
             glyphs.factory.encoder.flush(device);
         });
     }
 
-    //checks if the user pressed the right window key for the target.
-    fn is_right_target(&self, user_input: piston_window::Key) {
+    //checks if the user pressed the right window key for the target. Increases the score for right target.
+    //@returns true for every right target
+    fn is_right_target(&mut self, user_input: piston_window::Key) -> bool {
         let user_choice = [Key::Q, Key::R, Key::U, Key::P]
             .iter()
             .position(|&r| r == user_input);
-        let mut user_choice_window: usize = 11;
         match user_choice {
-            Some(index) => user_choice_window = index,
-            None => {}
-        };
-        println!(
-            "window {} -- user choice {}",
-            self.current_target_window, user_choice_window
-        );
+            Some(user_choice_window) => {
+                if self.current_target_window == user_choice_window {
+                    self.increment_score();
+                    return true;
+                }
+                false
+            }
+            None => false,
+        }
     }
 
     /**
@@ -159,8 +173,12 @@ impl Game {
         self.page = page_number;
     }
 
-    fn set_current_target_window(&mut self, window_number: i32) {
+    fn set_current_target_window(&mut self, window_number: usize) {
         self.current_target_window = window_number;
+    }
+
+    fn increment_score(&mut self) {
+        self.total_score += 10;
     }
 
     pub fn handle_usere_input(&mut self, key: piston_window::Key) {
