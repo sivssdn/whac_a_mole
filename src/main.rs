@@ -17,7 +17,7 @@ fn main() {
         .unwrap();
     let mut game = game::Game {
         page: 1,
-        window: window,
+        window: window.max_fps(4),
         assets: assets,
         control_keys: ["Q", "R", "U", "P"],
         current_target_window: 11,
