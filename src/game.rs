@@ -41,6 +41,7 @@ impl Game {
             .window
             .load_font(self.assets.join("Amatic-Bold.ttf"))
             .unwrap();
+        let mole_image = self.get_image("wild.png");
         self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
             rectangle(
@@ -49,13 +50,18 @@ impl Game {
                 context.transform,
                 graphics,
             );
+            image(
+                &mole_image,
+                context.transform.scale(0.4, 0.4).trans(900.0, 300.0),
+                graphics,
+            );
 
             text::Text::new_color([1.0, 1.0, 1.0, 1.0], 52)
                 .draw(
                     "Press 'enter' to start",
                     &mut glyphs,
                     &context.draw_state,
-                    context.transform.trans(320.0, 300.0),
+                    context.transform.trans(320.0, 460.0),
                     graphics,
                 )
                 .unwrap();
