@@ -10,6 +10,7 @@ pub struct Game {
     pub assets: PathBuf,
     pub control_keys: [&'static str; 4],
     pub current_target_window: usize,
+    pub last_target_window: usize,
     pub total_score: i32,
 }
 
@@ -85,7 +86,11 @@ impl Game {
         let score = self.total_score;
         let control_keys = self.control_keys;
         let [window_number, target_x, target_y] = self.get_target_location();
+        self.last_target_window = self.current_target_window;
         self.set_current_target_window(window_number as usize);
+        if self.last_target_window == 11 {
+            self.last_target_window = self.current_target_window; //for the first iteration
+        }
 
         self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
@@ -144,7 +149,7 @@ impl Game {
             .position(|&r| r == user_input);
         match user_choice {
             Some(user_choice_window) => {
-                if self.current_target_window == user_choice_window {
+                if self.last_target_window == user_choice_window {
                     self.increment_score();
                     return true;
                 }
