@@ -23,6 +23,7 @@ fn main() {
         current_target_window: 11,
         last_target_window: 11,
         total_score: 0,
+        target_hit_status: 0,
     }; //move to constructor
 
     while let Some(event) = game.window.next() {

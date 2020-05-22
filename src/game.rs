@@ -2,7 +2,7 @@ extern crate rand;
 
 use piston_window::*;
 use rand::Rng;
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 pub struct Game {
     pub page: u8,
@@ -12,6 +12,7 @@ pub struct Game {
     pub current_target_window: usize,
     pub last_target_window: usize,
     pub total_score: i32,
+    pub target_hit_status: i32,
 }
 
 impl Game {
@@ -91,11 +92,13 @@ impl Game {
         if self.last_target_window == 11 {
             self.last_target_window = self.current_target_window; //for the first iteration
         }
+        let black = self.get_color(0);
+        let target_hit_status_color = self.get_color(self.target_hit_status);
 
         self.window.draw_2d(&event, |context, graphics, device| {
             clear([1.0; 4], graphics);
             rectangle(
-                [0.0, 0.0, 0.0, 1.0], // page background
+                black, // page background
                 [0.0, 0.0, 1024.0, 720.0],
                 context.transform,
                 graphics,
@@ -136,9 +139,17 @@ impl Game {
                     graphics,
                 )
                 .unwrap();
+            //keypress circle
+            Ellipse::new(target_hit_status_color).draw(
+                ellipse::circle(980.0, 680.0, 20.0),
+                &context.draw_state,
+                context.transform,
+                graphics,
+            );
             // Update glyphs before rendering.
             glyphs.factory.encoder.flush(device);
         });
+        self.target_hit_status = 0; //reset
     }
 
     //checks if the user pressed the right window key for the target. Increases the score for right target.
@@ -174,6 +185,18 @@ impl Game {
         ]
     }
 
+    /**
+     * @param int. 0 = black, 1 = red, 2 = green.
+     * @return color codes array for piston window.
+     */
+    fn get_color(&self, code: i32) -> [f32; 4] {
+        let mut colors = HashMap::new();
+        colors.insert(0, [0.0, 0.0, 0.0, 1.0]); //black
+        colors.insert(1, [1.0, 0.0, 0.0, 1.0]); //red
+        colors.insert(2, [0.0, 1.0, 0.0, 0.7]); //green
+        colors[&code]
+    }
+
     fn set_page(&mut self, page_number: u8) {
         self.page = page_number;
     }
@@ -194,7 +217,11 @@ impl Game {
                 }
             }
             _ => {
-                self.is_right_target(key);
+                if self.is_right_target(key) {
+                    self.target_hit_status = 2
+                } else {
+                    self.target_hit_status = 1
+                };
             }
         }
     }
