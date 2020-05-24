@@ -5,17 +5,30 @@ use rand::Rng;
 use std::{collections::HashMap, path::PathBuf};
 
 pub struct Game {
-    pub page: u8,
+    page: u8,
     pub window: PistonWindow,
     pub assets: PathBuf,
-    pub control_keys: [&'static str; 4],
-    pub current_target_window: usize,
-    pub last_target_window: usize,
-    pub total_score: i32,
-    pub target_hit_status: i32,
+    control_keys: [&'static str; 4],
+    current_target_window: usize,
+    last_target_window: usize,
+    total_score: i32,
+    target_hit_status: i32,
 }
 
 impl Game {
+    pub fn new(window: PistonWindow, assets: PathBuf) -> Game {
+        Game {
+            page: 1,
+            window: window,
+            assets: assets,
+            control_keys: ["Q", "R", "U", "P"],
+            current_target_window: 11,
+            last_target_window: 11,
+            total_score: 0,
+            target_hit_status: 0,
+        }
+    }
+
     //calls page render based on page number background: &G2dTexture
     pub fn render(&mut self, event: piston_window::Event) {
         match self.page {
@@ -177,7 +190,7 @@ impl Game {
      * 3. Y-axis fixed value.
      */
     fn get_target_location(&self) -> [f64; 3] {
-        let choosen_coords: f64 = rand::thread_rng().gen_range(0.0, 4.0);
+        let choosen_coords: f64 = thread_rng().gen_range(0.0, 4.0);
         [
             choosen_coords,
             230.0 + (choosen_coords.floor() * 810.0),

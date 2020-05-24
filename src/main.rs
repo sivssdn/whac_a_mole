@@ -15,16 +15,7 @@ fn main() {
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets")
         .unwrap();
-    let mut game = game::Game {
-        page: 1,
-        window: window.max_fps(4),
-        assets: assets,
-        control_keys: ["Q", "R", "U", "P"],
-        current_target_window: 11,
-        last_target_window: 11,
-        total_score: 0,
-        target_hit_status: 0,
-    }; //move to constructor
+    let mut game = game::Game::new(window.max_fps(4), assets);
 
     while let Some(event) = game.window.next() {
         if let Some(Button::Keyboard(key)) = event.press_args() {
