@@ -1,7 +1,7 @@
 extern crate rand;
 
 use piston_window::*;
-use rand::Rng;
+use rand::{thread_rng, Rng};
 use std::{collections::HashMap, path::PathBuf};
 
 pub struct Game {
